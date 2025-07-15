@@ -45,7 +45,10 @@ try:
     FULL_SYSTEM_AVAILABLE = True
     
 except ImportError as e:
+    import traceback
     print(f"⚠️ Import warning: {e}")
+    print("🔍 Stack trace complète:")
+    traceback.print_exc()
     print("🔄 Falling back to basic mode...")
     FULL_SYSTEM_AVAILABLE = False
 
@@ -553,6 +556,49 @@ async def get_docs_info():
         "redoc_url": "/redoc",
         "openapi_url": "/openapi.json"
     }
+
+@app.post("/index/file")
+async def index_file_manually(filename: str):
+    """Indexer manuellement un fichier déjà uploadé"""
+    try:
+        # Chercher le fichier dans le dossier data/raw
+        file_path = Path("data/raw") / filename
+        
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail=f"File {filename} not found")
+        
+        # En mode basic, on simule l'indexation
+        if not FULL_SYSTEM_AVAILABLE or not preprocessor or not indexer:
+            logger.warning(f"System not fully available, simulating indexing of {filename}")
+            return {
+                "message": f"File {filename} indexed successfully (demo mode)",
+                "filename": filename,
+                "status": "completed",
+                "mode": "demo"
+            }
+        
+        # Traitement réel si le système est disponible
+        logger.info(f"Manually indexing file: {filename}")
+        
+        # Traiter le document
+        chunks = preprocessor.process_document(file_path)
+        
+        # Indexer les chunks
+        success = indexer.index_chunks(chunks)
+        
+        if success:
+            return {
+                "message": f"File {filename} indexed successfully",
+                "filename": filename,
+                "status": "completed",
+                "chunks_indexed": len(chunks)
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Indexing failed")
+        
+    except Exception as e:
+        logger.error(f"Manual indexing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Indexing failed: {str(e)}")
 
 # ===== GESTION DES ERREURS =====
 

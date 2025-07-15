@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional, Union
 from .llm.openai_llm import OpenAILLM
 from .llm.anthropic_llm import AnthropicLLM
 from .llm.huggingface_llm import HuggingFaceLLM
+from .llm.gemini_provider import GeminiProvider
 from .prompt_templates.multimodal_prompts import MultimodalPrompts
 from .context_builder import ContextBuilder
 from config.settings import settings
@@ -13,7 +14,8 @@ class ResponseGenerator:
     """Main response generator for RAG system."""
     
     def __init__(self, 
-                 llm_provider: str = "openai",
+                 #llm_provider: str = "openai",
+                 llm_provider: str = "gemini",
                  model_name: Optional[str] = None,
                  use_context_builder: bool = True):
         
@@ -30,7 +32,7 @@ class ResponseGenerator:
         
         logger.info(f"Response generator initialized with {llm_provider}")
     
-    def _initialize_llm(self, provider: str, model_name: Optional[str]) -> Union[OpenAILLM, AnthropicLLM, HuggingFaceLLM]:
+    def _initialize_llm(self, provider: str, model_name: Optional[str]) -> Union[OpenAILLM, AnthropicLLM, HuggingFaceLLM, GeminiProvider]:
         """Initialize the specified LLM provider."""
         try:
             if provider == "openai":
@@ -48,6 +50,12 @@ class ResponseGenerator:
             elif provider == "huggingface":
                 model = model_name or "microsoft/DialoGPT-medium"
                 return HuggingFaceLLM(model)
+        
+            elif provider == "gemini":
+                if not settings.gemini_api_key:
+                    raise ValueError("Gemini API key not configured")
+                model = model_name or "gemini-2.0-flash-exp"
+                return GeminiProvider(settings.gemini_api_key, model)
                 
             else:
                 raise ValueError(f"Unsupported LLM provider: {provider}")

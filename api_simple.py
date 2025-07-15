@@ -302,6 +302,31 @@ async def search_similar(
     )
     return await search_documents(request)
 
+@app.post("/index/file")
+async def index_file_manually(filename: str):
+    """Indexer manuellement un fichier déjà uploadé"""
+    try:
+        # Chercher le fichier dans le dossier data/raw
+        file_path = Path("data/raw") / filename
+        
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail=f"File {filename} not found")
+        
+        # Simuler l'indexation (en mode démo)
+        logger.info(f"Manually indexing file: {filename}")
+        
+        # En mode démo, on simule juste le traitement
+        return {
+            "message": f"File {filename} indexed successfully",
+            "filename": filename,
+            "status": "completed",
+            "mode": "demo"
+        }
+        
+    except Exception as e:
+        logger.error(f"Manual indexing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Indexing failed: {str(e)}")
+
 @app.get("/status")
 async def get_system_status():
     """Statut détaillé du système"""

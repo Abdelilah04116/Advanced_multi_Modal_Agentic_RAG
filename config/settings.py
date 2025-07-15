@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     huggingface_api_key: Optional[str] = None
+    gemini_api_key: str | None = None
     
     # Database
     qdrant_url: str = "http://localhost:6333"
@@ -31,7 +32,7 @@ class Settings(BaseSettings):
     
     # Model Configuration
     default_text_model: str = "all-MiniLM-L6-v2"
-    default_image_model: str = "clip-ViT-B-32"
+    default_image_model: str = "ViT-B/32"
     default_llm_model: str = "gpt-3.5-turbo"
     chunk_size: int = 512
     chunk_overlap: int = 50

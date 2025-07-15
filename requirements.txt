@@ -13,10 +13,10 @@ langchain==0.0.350
 sentence-transformers==2.2.2
 transformers==4.36.0
 
-# Deep Learning
-torch==2.1.0
-torchvision==0.16.0
-torchaudio==2.1.0
+# Deep Learning (Updated versions)
+torch>=2.2.0
+torchvision>=0.17.0
+torchaudio>=2.2.0
 
 # API Clients
 openai==1.3.0
@@ -75,3 +75,5 @@ ffmpeg-python==0.2.0
 
 # Additional dependencies for Windows compatibility
 pywin32==306; sys_platform == "win32"
+
+google-generativeai
